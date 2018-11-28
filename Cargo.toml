@@ -1,0 +1,16 @@
+[package]
+name = "rocket-recipes"
+description = "A collection of several small recipes containing routes on most common use cases."
+version = "0.0.0"
+publish = false
+
+[dependencies]
+rocket = "0.4.0-rc.1"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+
+[dependencies.rocket_contrib]
+version = "0.4.0-rc.1"
+default-features = false
+features = ["handlebars_templates", "tera_templates", "json"]

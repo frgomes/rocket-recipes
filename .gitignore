@@ -1,0 +1,17 @@
+*.lock
+*~
+*\.ZILESAVE
+*\.tmp
+*\.log
+*\.out
+/\.classpath
+/\.project
+/\.settings
+/\.idea
+/\.idea_modules
+/\.lib
+*\.iml
+\.classpath_nb
+\.ensime
+\.ensime_lucene
+target/
