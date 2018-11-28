@@ -24,7 +24,7 @@ Downloading and running these recipes is easy. Just follow the instructions belo
 #!/bin/bash
 mkdir -p $HOME/workspace
 cd $HOME/workspace
-git clone http://github.com/frgomes/rust-rocket-recipes
-cd rust-rocket-recipes
+git clone http://github.com/frgomes/rocket-recipes
+cd rocket-recipes
 cargo test
 ```
