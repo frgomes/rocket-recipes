@@ -13,6 +13,14 @@ Setting up a development environment for Rust is simple: it's a matter of instal
 curl https://sh.rustup.rs -sSf | sh
 ```
 
+Note: Rocket requires the nightly tool chain at the moment.
+You can either setup the default toolchain globally
+or you per project. This is how you can do it:
+
+```bash
+rustup default nightly
+```
+
 Getting Started
 ----
 
