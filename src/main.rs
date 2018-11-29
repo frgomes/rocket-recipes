@@ -1,8 +1,8 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate rocket;
-#[macro_use] extern crate serde_derive;
 #[macro_use] extern crate rocket_contrib;
+#[macro_use] extern crate serde_derive;
 
 use rocket::Data;
 use rocket::request::{Form, LenientForm};
@@ -17,7 +17,8 @@ use std::io::{self, repeat, Repeat, Read, Take};
 #[derive(Serialize, Deserialize)]
 struct User {
     fullname: String,
-    email: String
+    email   : String,
+    age     : i32,
 }
 
 #[get("/")]
@@ -26,26 +27,22 @@ fn index() -> &'static str {
     "
 }
 
-// http --json --verbose POST :8000/jsontext "fullname=Richard Gomes" email=rgomes.info@gmail.com
+// http --json --verbose POST :8000/jsontext "fullname=John Doe" email=john.doe@example.com age=35
 #[post("/jsontext", format = "json", data = "<user>")]
 fn jsontext(user: Json<User>) -> String {
-    format!("{}<{}>", user.fullname, user.email)
+    format!("{}<{}> is {} years old", user.fullname, user.email, user.age)
 }
 
-// http --json --verbose POST :8000/json "fullname=Richard Gomes" email=rgomes.info@gmail.com
+// http --json --verbose POST :8000/jsonjson "fullname=John Doe" email=john.doe@example.com age=35
 #[post("/jsonjson", format = "json", data = "<user>")]
-fn jsonjson(user: Json<User>) -> JsonValue {
-    //json!("{}<{}>", user.fullname, user.email)
-        json!({
-            "fullname": user.fullname,
-            "email": user.email
-        })
+fn jsonjson(user: Json<User>) -> Json<User> {
+    user
 }
 
-// http --form --verbose POST :8000/form "fullname=Richard Gomes" email=rgomes.info@gmail.com
-#[post("/form", data = "<user>")]
-fn form(user: Form<User>) -> String {
-    format!("{}<{}>", user.fullname, user.email)
+// http --form --verbose POST :8000/formtext "fullname=John Doe" email=john.doe@example.com age=35
+#[post("/formtext", data = "<user>")]
+fn formtext(user: Form<User>) -> String {
+    format!("{}<{}> is {} years old", user.fullname, user.email, user.age)
 }
 
 #[post("/upload", format = "plain", data = "<data>")]
@@ -56,6 +53,6 @@ fn upload(data: Data) -> io::Result<String> {
 fn main() {
     rocket::ignite()
         //FIXME: .attach(Template::fairing())
-        .mount("/", routes![index, jsontext, jsonjson, form, upload])
+        .mount("/", routes![index, jsontext, jsonjson, formtext, upload])
         .launch();
 }
