@@ -16,7 +16,8 @@ use std::io::{self, repeat, Repeat, Read, Take};
 #[derive(FromForm)]
 #[derive(Serialize, Deserialize)]
 struct User {
-    fullname: String,
+    username: String,
+    realname: String,
     email   : String,
     age     : i32,
 }
@@ -27,22 +28,48 @@ fn index() -> &'static str {
     "
 }
 
-// http --json --verbose POST :8000/jsontext "fullname=John Doe" email=john.doe@example.com age=35
-#[post("/jsontext", format = "json", data = "<user>")]
-fn jsontext(user: Json<User>) -> String {
-    format!("{}<{}> is {} years old", user.fullname, user.email, user.age)
+// http --verbose POST :8000/texttext username=jsmith
+#[post("/texttext", data = "<username>")]
+fn texttext(username: String) -> String {
+    username
 }
 
-// http --json --verbose POST :8000/jsonjson "fullname=John Doe" email=john.doe@example.com age=35
+// http --verbose POST :8000/textjson username=jsmith
+#[post("/textjson", data = "<username>")]
+fn textjson(username: String) -> Json<User> {
+    Json(User { username: username, realname: "(unknown)".into(), email: "(unknown)".into(), age: 0 })
+}
+
+// http --json --verbose POST :8000/jsontext "realname=John Smith" email=john.smith@example.com age=35
+#[post("/jsontext", format = "json", data = "<user>")]
+fn jsontext(user: Json<User>) -> String {
+    format!(
+        "username: {}
+         realname:{}
+         email: {}
+         age: {}", user.username, user.realname, user.email, user.age)
+}
+
+// http --json --verbose POST :8000/jsonjson "realname=John Smith" email=john.smith@example.com age=35
 #[post("/jsonjson", format = "json", data = "<user>")]
 fn jsonjson(user: Json<User>) -> Json<User> {
     user
 }
 
-// http --form --verbose POST :8000/formtext "fullname=John Doe" email=john.doe@example.com age=35
+// http --form --verbose POST :8000/formtext "realname=John Smith" email=john.smith@example.com age=35
 #[post("/formtext", data = "<user>")]
 fn formtext(user: Form<User>) -> String {
-    format!("{}<{}> is {} years old", user.fullname, user.email, user.age)
+    format!(
+        "username: {}
+         realname:{}
+         email: {}
+         age: {}", user.username, user.realname, user.email, user.age)
+}
+
+// http --form --verbose POST :8000/formjson "realname=John Smith" email=john.smith@example.com age=35
+#[post("/formjson", data = "<user>")]
+fn formjson(user: Form<User>) -> Json<User> {
+    Json(user.into_inner())
 }
 
 #[post("/upload", format = "plain", data = "<data>")]
@@ -53,6 +80,6 @@ fn upload(data: Data) -> io::Result<String> {
 fn main() {
     rocket::ignite()
         //FIXME: .attach(Template::fairing())
-        .mount("/", routes![index, jsontext, jsonjson, formtext, upload])
+        .mount("/", routes![index, texttext, textjson, jsontext, jsonjson, formtext, upload])
         .launch();
 }
